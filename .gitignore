@@ -1,0 +1,52 @@
+# Visual Studio General
+.vs/
+*.user
+*.aps
+*.ncb
+*.opendb
+*.pdb
+*.sqlit*
+*.suo
+*.temp
+
+# Build Folders
+bin/
+obj/
+x64/
+x86/
+Debug/
+Release/
+GeneratedFiles/
+release_bundle/
+
+# Log Files
+*.log
+*.tlog
+
+# Notepad++ Temp Files
+*.new
+*.bak
+npp_theme_switch.bat
+
+# Project specific
+dark_mode_C/dark_mode_C/x64/
+dark_mode_C/dark_mode_C/Debug/
+dark_mode_C/dark_mode_C/Release/
+
+# Linker / incremental build artifacts
+*.exp
+*.lib
+*.ilk
+*.idb
+*.iobj
+*.ipdb
+*.obj
+
+# VS database files
+*.sdf
+*.VC.db
+*.VC.opendb
+
+# Windows shell noise
+Thumbs.db
+Desktop.ini

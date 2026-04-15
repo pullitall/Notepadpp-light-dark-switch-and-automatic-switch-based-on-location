@@ -1,0 +1,26 @@
+#include <winres.h>
+#include "resource.h"
+
+IDI_ICON_SUN    ICON    "icon_sun_clean.ico"
+IDI_ICON_NIGHT  ICON    "icon_night_clean.ico"
+IDI_ICON_AUTO   ICON    "icon_auto_clean.ico"
+
+// Corrected BMP definitions - paths adjusted to reflect files in the project root
+IDB_BMP_SUN_16X16 BITMAP "bmp_sun_16x16.bmp"
+IDB_BMP_NIGHT_16X16 BITMAP "bmp_night_16x16.bmp"
+IDB_BMP_AUTO_16X16 BITMAP "bmp_auto_16x16.bmp"
+
+IDD_SETTINGS_DIALOG DIALOGEX 0, 0, 180, 110
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Location Settings"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Select City:",IDC_STATIC,10,12,40,8
+    COMBOBOX        IDC_CITY_COMBO,55,10,115,100,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Latitude:",IDC_STATIC,10,35,40,8
+    EDITTEXT        IDC_LATITUDE,55,32,115,14,ES_AUTOHSCROLL
+    LTEXT           "Longitude:",IDC_STATIC,10,55,40,8
+    EDITTEXT        IDC_LONGITUDE,55,52,115,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Save",IDOK,30,85,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,100,85,50,14
+END
