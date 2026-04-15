@@ -21,7 +21,7 @@ A Notepad++ plugin that switches between light and dark mode **live**, with no r
 
 - Notepad++ **8.0 or later** (dark mode support required).
 - Windows x64 build of Notepad++.
-- English UI (the plugin currently matches the Preferences dialog by English labels — see [How it works](#how-it-works)).
+- Any NPP UI language — the plugin drives Preferences by control IDs, not labels.
 
 ## Installation
 
@@ -88,8 +88,9 @@ Notepad++ exposes no public API to toggle dark mode at runtime — `NPPM_ISDARKM
 
 1. A worker thread is spawned.
 2. The main thread opens Preferences via `NPPM_MENUCOMMAND(IDM_SETTING_PREFERENCE)`.
-3. The worker finds the dialog, parks it off-screen, selects the **Dark Mode** tab (triggering sub-dialog creation), sends `BM_CLICK` to the Light / Dark radio, and posts `WM_CLOSE`.
+3. The worker finds the dialog by window class and owner (not title), iterates the applet list by index, and identifies the Dark Mode tab by probing for NPP's stable radio control IDs (`7131`/`7132` from `preference_rc.h`). It then sends `BM_CLICK` to the Light / Dark radio and posts `WM_CLOSE`.
 4. Because `BM_CLICK` routes through Notepad++'s own handlers, the UI flips through NPP's normal code path — same result as a manual click, just invisible and scripted.
+5. No UI text is matched anywhere, so the plugin works regardless of the Notepad++ language.
 
 Auto Mode uses a `SetTimer` callback to re-run the sunrise/sunset check every five minutes.
 

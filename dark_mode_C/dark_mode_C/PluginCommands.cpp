@@ -170,23 +170,28 @@ void showSettingsDlg() { DialogBox(hModule, MAKEINTRESOURCE(IDD_SETTINGS_DIALOG)
 // path is through the Preferences dialog, which directly mutates NPP's internal
 // state. We open it off-screen, select the Dark Mode tab, click the Light/Dark
 // radio, and close — the UI flips without a restart.
+//
+// Language-independent: we locate the dialog by window class (#32770, the
+// standard Win32 dialog class) and find the Dark Mode tab by probing for
+// NPP's stable control IDs rather than matching UI text.
 
-struct FindCtx {
-    const wchar_t* text;
+// From NPP source: PowerEditor/src/WinControls/Preference/preference_rc.h
+#define NPP_IDC_RADIO_DARKMODE_LIGHTMODE      7131
+#define NPP_IDC_RADIO_DARKMODE_DARKMODE       7132
+
+struct FindByIdCtx {
+    int wantId;
     HWND found;
-    bool wantButton;
 };
 
-static BOOL CALLBACK findChildByTextProc(HWND hwnd, LPARAM lp) {
-    auto* ctx = reinterpret_cast<FindCtx*>(lp);
-    wchar_t cls[32];
-    if (!GetClassName(hwnd, cls, 32)) return TRUE;
-    if (ctx->wantButton && _wcsicmp(cls, L"Button") != 0) return TRUE;
-    wchar_t text[128];
-    if (GetWindowTextW(hwnd, text, 128) == 0) return TRUE;
-    if (_wcsicmp(text, ctx->text) == 0) {
-        ctx->found = hwnd;
-        return FALSE;
+static BOOL CALLBACK findChildByIdProc(HWND hwnd, LPARAM lp) {
+    auto* ctx = reinterpret_cast<FindByIdCtx*>(lp);
+    if (GetDlgCtrlID(hwnd) == ctx->wantId) {
+        wchar_t cls[32];
+        if (GetClassName(hwnd, cls, 32) && _wcsicmp(cls, L"Button") == 0) {
+            ctx->found = hwnd;
+            return FALSE;
+        }
     }
     return TRUE;
 }
@@ -201,14 +206,19 @@ static BOOL CALLBACK findListBoxProc(HWND hwnd, LPARAM lp) {
 }
 
 static BOOL CALLBACK findPrefsProc(HWND hwnd, LPARAM lp) {
-    wchar_t title[256];
-    if (GetWindowTextW(hwnd, title, 256) > 0
-        && wcsstr(title, L"Preferences") != nullptr
-        && IsWindowVisible(hwnd)) {
-        *reinterpret_cast<HWND*>(lp) = hwnd;
-        return FALSE;
-    }
-    return TRUE;
+    if (!IsWindowVisible(hwnd)) return TRUE;
+    wchar_t cls[32];
+    if (GetClassName(hwnd, cls, 32) == 0) return TRUE;
+    // Preferences is a standard modal dialog (class #32770) owned by NPP's
+    // main window. Filter on both so we don't grab an unrelated popup.
+    if (_wcsicmp(cls, L"#32770") != 0) return TRUE;
+    if (GetWindow(hwnd, GW_OWNER) != nppData._nppHandle) return TRUE;
+    // Must contain a ListBox (the applet selector) to be Preferences.
+    HWND lb = nullptr;
+    EnumChildWindows(hwnd, findListBoxProc, reinterpret_cast<LPARAM>(&lb));
+    if (!lb) return TRUE;
+    *reinterpret_cast<HWND*>(lp) = hwnd;
+    return FALSE;
 }
 
 struct ApplyModeArgs {
@@ -234,24 +244,29 @@ static DWORD WINAPI applyModeWorker(LPVOID lpParam) {
     EnumChildWindows(prefs, findListBoxProc, reinterpret_cast<LPARAM>(&listBox));
     if (!listBox) { PostMessageW(prefs, WM_CLOSE, 0, 0); return 2; }
 
-    int idx = static_cast<int>(SendMessageW(listBox, LB_FINDSTRING,
-        static_cast<WPARAM>(-1), reinterpret_cast<LPARAM>(L"Dark Mode")));
-    if (idx == LB_ERR) { PostMessageW(prefs, WM_CLOSE, 0, 0); return 3; }
-
-    // Selecting the item triggers LBN_SELCHANGE, which makes NPP lazy-create
-    // the Dark Mode sub-dialog so its radios become reachable.
-    SendMessageW(listBox, LB_SETCURSEL, idx, 0);
+    // Iterate applets by index instead of by UI text (which varies by NPP
+    // language). Each selection triggers LBN_SELCHANGE, which makes NPP
+    // lazy-create the corresponding sub-dialog. The Dark Mode applet is the
+    // one whose sub-dialog exposes NPP's dark-mode radio IDs.
+    int count = static_cast<int>(SendMessageW(listBox, LB_GETCOUNT, 0, 0));
+    if (count <= 0) { PostMessageW(prefs, WM_CLOSE, 0, 0); return 3; }
     int listId = GetDlgCtrlID(listBox);
-    SendMessageW(GetParent(listBox), WM_COMMAND,
-        MAKEWPARAM(listId, LBN_SELCHANGE), reinterpret_cast<LPARAM>(listBox));
+    HWND parent = GetParent(listBox);
 
-    const wchar_t* wantText = args->wantDark ? L"Dark mode" : L"Light mode";
     HWND radio = nullptr;
-    for (int i = 0; i < 30 && !radio; ++i) {
+    for (int i = 0; i < count && !radio; ++i) {
+        SendMessageW(listBox, LB_SETCURSEL, i, 0);
+        SendMessageW(parent, WM_COMMAND,
+            MAKEWPARAM(listId, LBN_SELCHANGE), reinterpret_cast<LPARAM>(listBox));
+        // Sub-dialog creation is synchronous for LBN_SELCHANGE, but give
+        // Windows a tick to finish child-window wiring before probing.
         Sleep(20);
-        FindCtx ctx = { wantText, nullptr, true };
-        EnumChildWindows(prefs, findChildByTextProc, reinterpret_cast<LPARAM>(&ctx));
-        radio = ctx.found;
+        int wantId = args->wantDark
+            ? NPP_IDC_RADIO_DARKMODE_DARKMODE
+            : NPP_IDC_RADIO_DARKMODE_LIGHTMODE;
+        FindByIdCtx ctx = { wantId, nullptr };
+        EnumChildWindows(prefs, findChildByIdProc, reinterpret_cast<LPARAM>(&ctx));
+        if (ctx.found) radio = ctx.found;
     }
     if (!radio) { PostMessageW(prefs, WM_CLOSE, 0, 0); return 4; }
 
