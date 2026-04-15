@@ -2,8 +2,7 @@
 
 A Notepad++ plugin that switches between light and dark mode **live**, with no restart, and an automatic sunrise/sunset mode driven by your location.
 
-**How the plugin presents itself on the bar**
-
+**How the plugin presents itself on the bar (last 3 icons)**
 <img width="610" height="32" alt="image" src="https://github.com/user-attachments/assets/036abcf8-3194-4174-9eae-91d1301bc19d" />
 
 > **Requires Notepad++ 8.0 or later** — earlier versions have no dark mode to toggle.
