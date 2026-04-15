@@ -22,10 +22,11 @@ A Notepad++ plugin that switches between light and dark mode **live**, with no r
 
 ### Using the installer script
 
-1. Download the latest `dark_mode_C.dll` from the Releases page.
-2. Place it next to `install_plugin.bat`.
+1. Download the latest `dark_mode_C.zip` from the Releases page.
+2. Extract the content of zip anywhere onto your machine (desktop)
 3. Right-click `install_plugin.bat` → **Run as Administrator** (required if Notepad++ lives under `Program Files`).
 4. Choose **Install / Update Plugin**.
+
 
 The script locates your Notepad++ install, validates the DLL architecture, closes Notepad++ if it's running, and copies the DLL into `plugins\dark_mode_C\`.
 
