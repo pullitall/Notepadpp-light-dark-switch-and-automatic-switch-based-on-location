@@ -1,4 +1,4 @@
-# Dark Mode C
+# Dark Mode for Notepad++
 
 A Notepad++ plugin that switches between light and dark mode **live**, with no restart, and an automatic sunrise/sunset mode driven by your location.
 
