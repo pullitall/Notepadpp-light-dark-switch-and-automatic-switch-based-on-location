@@ -2,7 +2,7 @@
 
 A Notepad++ plugin that switches between light and dark mode **live**, with no restart, and an automatic sunrise/sunset mode driven by your location.
 
-**How the plugin presents itself on the bar (last 3 icons: day, night, automatic mode)**
+**How the plugin presents itself on the bar (last 3 icons: light, dark, automatic mode)**
 
 <img width="610" height="32" alt="image" src="https://github.com/user-attachments/assets/036abcf8-3194-4174-9eae-91d1301bc19d" />
 
@@ -11,7 +11,7 @@ A Notepad++ plugin that switches between light and dark mode **live**, with no r
 
 ## Features
 
-- **Day Mode** / **Night Mode** — one-click switch; the UI flips instantly.
+- **Light Mode** / **Dark Mode** — one-click switch; the UI flips instantly.
 - **Auto Mode** — computes today's sunrise/sunset from your latitude/longitude, applies the correct theme now, and re-checks every 5 minutes so it flips on its own as the day progresses.
 - **Location picker** — ~60 preset cities across all major time zones, or enter custom coordinates.
 - **Toolbar icons** — dedicated Sun / Moon / Auto icons, dark-mode aware.
@@ -48,8 +48,8 @@ All commands are under **Plugins → dark_mode_C**:
 
 | Command | What it does |
 |---|---|
-| **Day Mode** | Flip to light mode immediately. Disarms Auto Mode if running. |
-| **Night Mode** | Flip to dark mode immediately. Disarms Auto Mode if running. |
+| **Light Mode** | Flip to light mode immediately. Disarms Auto Mode if running. |
+| **Dark Mode** | Flip to dark mode immediately. Disarms Auto Mode if running. |
 | **Auto Mode** | Compute sunrise/sunset for your location, apply the correct theme, and keep it in sync for the rest of the session. |
 | **Settings** | Pick a city preset or enter custom latitude/longitude. Saved for future sessions. |
 
