@@ -20,7 +20,7 @@ A Notepad++ plugin that switches between light and dark mode **live**, with no r
 ## Requirements
 
 - Notepad++ **8.0 or later** (dark mode support required).
-- Windows x64/x86 **pick correct version** build of Notepad++. 
+- Windows x64/x86 build of Notepad++. **pick correct version**
 - Any NPP UI language — the plugin drives Preferences by control IDs, not labels.
 
 ## Installation
