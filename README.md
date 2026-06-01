@@ -79,8 +79,8 @@ Edit by hand if you prefer, or use the Settings dialog.
 Prerequisites: Visual Studio 2022 with the C++ desktop workload.
 
 1. Open `dark_mode_C/dark_mode_C.sln`.
-2. Select configuration **Release** / platform **x64**.
-3. Build. Output: `dark_mode_C/x64/Release/dark_mode_C.dll`. (depends on x64/x86 selection)
+2. Select configuration **Release** / platform **x64**.(x86/ARM64)
+3. Build. Output: `dark_mode_C/x64/Release/dark_mode_C.dll`. (depends on x64/x86/ARM64 selection)
 
 ## How it works
 
