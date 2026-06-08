@@ -1,0 +1,44 @@
+name: CI_build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: windows-2025-vs2026
+    strategy:
+      fail-fast: false
+      matrix:
+        build_configuration: [Release, Debug]
+        build_platform: [x64, Win32, ARM64]
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v6
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v3
+
+    - name: MSBuild of plugin dll
+      working-directory: dark_mode_C\dark_mode_C
+      run: msbuild dark_mode_C.vcxproj /m /p:configuration="${{ matrix.build_configuration }}" /p:platform="${{ matrix.build_platform }}"
+
+    - uses: olegtarasov/get-tag@v2.1.4
+      id: tagName
+      
+    - name: zip artifacts for ${{ matrix.build_platform }}
+      if: matrix.build_configuration == 'Release'
+      run: 7z a DARK_MODE_NPP_${{ steps.tagName.outputs.tag }}_${{ matrix.build_platform }}.zip ..\Build_latest\${{ matrix.build_platform }}\dark_mode_C.dll
+
+    - name: Archive artifacts for ${{ matrix.build_platform }}
+      if: matrix.build_configuration == 'Release'
+      uses: actions/upload-artifact@v7
+      with:
+          name: DARK_MODE_NPP_${{ steps.tagName.outputs.tag }}_${{ matrix.build_platform }}.zip
+          path: DARK_MODE_NPP_${{ steps.tagName.outputs.tag }}_${{ matrix.build_platform }}.zip
+
+    - name: Create release on tagging
+      uses: softprops/action-gh-release@v3
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+          files: DARK_MODE_NPP_${{ steps.tagName.outputs.tag }}_${{ matrix.build_platform }}.zip
