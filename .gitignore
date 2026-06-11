@@ -32,6 +32,7 @@ npp_theme_switch.bat
 dark_mode_C/dark_mode_C/x64/
 dark_mode_C/dark_mode_C/Debug/
 dark_mode_C/dark_mode_C/Release/
+dark_mode_C/dark_mode_C_ARM64_test/
 
 # Linker / incremental build artifacts
 *.exp
